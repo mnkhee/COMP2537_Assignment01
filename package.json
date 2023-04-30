@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "express-mongoose": "^0.1.0",
+    "express-session": "^1.17.3",
+    "init": "^0.1.2"
+  },
+  "name": "comp2537_assignment01",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mnkhee/COMP2537_Assignment01.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mnkhee/COMP2537_Assignment01/issues"
+  },
+  "homepage": "https://github.com/mnkhee/COMP2537_Assignment01#readme",
+  "description": ""
+}
