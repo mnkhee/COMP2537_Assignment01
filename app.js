@@ -6,18 +6,18 @@ app.listen(3000, () => {
     console.log('server is running on port 3000');
 });
 
-const users = [
-    {
-        username: "admin",
-        password: "admin",
-        type: "administrator"
-    },
-    {
-        username: "user",
-        password: "user",
-        type: "non-administrator"
-    }
-];
+// const users = [
+//     {
+//         username: "admin",
+//         password: "admin",
+//         type: "administrator"
+//     },
+//     {
+//         username: "user",
+//         password: "user",
+//         type: "non-administrator"
+//     }
+// ];
 
 app.use(session({
     secret: 'the secret is sky color is blue ' // bad secret
