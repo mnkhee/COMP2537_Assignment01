@@ -6,6 +6,18 @@ app.listen(3000, () => {
     console.log('server is running on port 3000');
 });
 
+const users = [
+    {
+        username: "admin",
+        password: "admin",
+        type: "administrator"
+    },
+    {
+        username: "user",
+        password: "user",
+        type: "non-administrator"
+    }
+];
 
 app.use(session({
     secret: 'the secret is sky color is blue ' // bad secret
@@ -34,22 +46,36 @@ app.use(express.urlencoded({ extended: false }))
 
 app.post('/login', (req, res) => {
     // set a global variable to true if the user is authenticated
-    if (req.body.username === 'admin' && req.body.password === 'admin') {
+    if (users.find((user => user.username == req.body.username && user.password == req.body.password))) {
         req.session.GLOBAL_AUTHENTICATED = true;
+        req.session.loggedUsername = req.body.username;
+        req.session.loggedPassword = req.body.password;
     }
     res.redirect('/protectedRoute');
-
 });
 
 // only for authenticated users
 const authenticatedOnly = (req, res, next) => {
     if (!req.session.GLOBAL_AUTHENTICATED) {
-        return res.status(401).json({ error: 'not authenticated' });
+        return res.status(401).json({ error: "access denied" });
     }
-    next(); // allow the next route to run
+    next(); 
 };
 
 app.use(authenticatedOnly);
 app.get('/protectedRoute', (req, res) => {
-    res.send('<h1> protectedRoute </h1>');
+    res.send('Welcome');
 });
+
+const protectedRouteForAdminsOnlyMiddlewareFunctions = (req, res, next) => {
+    if (users.find((user) => user.username == req.session.loggedUsername && user.password == req.session.loggedPassword)?.type != "administrator") {
+        // return res.send("access denied");
+        res.send("access denied");
+    }
+    next();
+};
+app.use(protectedRouteForAdminsOnlyMiddlewareFunctions);
+
+app.get("/protectedRouteForAdminsOnly", (req, res) => {
+    res.send("Welcome Admin");
+})
