@@ -30,7 +30,7 @@ app.use(
 // Middleware that checks if the user has previously logged in
 const checkLoggedIn = (req, res, next) => {
     if (req.session.GLOBAL_AUTHENTICATED) {
-        return res.redirect("/protectedRoute");
+        return res.redirect("/members");
     }
     next();
 };
@@ -106,7 +106,6 @@ app.get("/login", checkLoggedIn, (req, res) => {
     `)
 });
 
-// GLOBAL_AUTHENTICATED = false;
 app.use(express.urlencoded({ extended: false }));
 app.post("/login", async (req, res) => {
 
@@ -147,10 +146,6 @@ app.post("/login", async (req, res) => {
     }
 });
 
-// app.get("*", (req, res) => {
-//     res.status(404).send("404 - Page not found");
-// })
-
 // only for authenticated users
 const authenticatedOnly = (req, res, next) => {
     if (!req.session.GLOBAL_AUTHENTICATED) {
@@ -160,9 +155,19 @@ const authenticatedOnly = (req, res, next) => {
 }
 app.use(authenticatedOnly);
 
+app.get("/protectedRoute", (req, res) => {
+    res.send(
+        `
+  <h1>Welcome!</h1>
+  <button><a style="color: black; text-decoration: none" href="/signout">Sign Out</a></button>
+  <button><a style="color: black; text-decoration: none" href="/members">Members Page</a></button>
+  `
+  );
+})
+
 
 app.use(express.static("public"));
-app.get("/protectedRoute", (req, res) => {
+app.get("/members", (req, res) => {
     const randomImageNumber = Math.floor(Math.random() * 3) + 1;
     const imageName = `00${randomImageNumber}.png`;
     HTMLResponse = `
@@ -200,7 +205,7 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
 };
 app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
-app.get("/protectedRouteForAdminsOnly", (req, res) => {
+app.get("/membersAdmin", (req, res) => {
     res.send("Welcome Admin");
 });
 
@@ -209,5 +214,3 @@ app.get("*", (req, res) => {
 })
 
 module.exports = app;
-
-// for logging out. request.session.destroy(err)
