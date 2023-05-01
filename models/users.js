@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const usersSchema = new mongoose.Scheme({
+const usersSchema = new mongoose.Schema({
     username: String,
     password: String,
     type: String

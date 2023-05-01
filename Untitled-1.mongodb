@@ -1,0 +1,25 @@
+
+// Select the database to use.
+use('comp2537w1');
+
+
+// Insert a few documents into the sales collection.
+db.getCollection("users").insertMany([
+    {
+        username: "admin",
+        password: "admin",
+        type: "administrator"
+    },
+    {
+        username: "user",
+        password: "user",
+        type: "non-administrator"
+    },
+    {
+        username: "test",
+        password: "test",
+        type: "non-administrator"
+    }
+]);
+
+// db.users.find()
