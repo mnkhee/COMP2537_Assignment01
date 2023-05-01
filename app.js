@@ -6,10 +6,6 @@ const bcrypt = require("bcrypt");
 
 var MongoDBStore = require("connect-mongodb-session")(session);
 
-app.listen(3000, () => {
-    console.log("server is running on port 3000")
-})
-
 var dbStore = new MongoDBStore({
     uri: "mongodb://localhost:27017/connect_mongodb_session_test",
     collection: "mySessions"
@@ -45,7 +41,7 @@ app.post("/login", async (req, res) => {
         req.session.GLOBAL_AUTHENTICATED = true;
         req.session.loggedUsername = req.body.username;
         req.session.loggedPassword = req.body.password;
-        res.redirect("/");
+        res.redirect("/protectedRoute");
     } else {
         res.send("incorrect password");
     }
@@ -59,8 +55,17 @@ const authenticatedOnly = (req, res, next) => {
     next();
 }
 app.use(authenticatedOnly);
+
+app.use(express.static("public"));
 app.get("/protectedRoute", (req, res) => {
-    res.send("Welcome");
+    const randomImageNumber = Math.floor(Math.random() * 3) + 1;
+    const imageName = `00${randomImageNumber}.png`;
+    HTMLResponse = `
+    Welcome
+    <br>
+    <img src="${imageName}" />
+    `
+    res.send(HTMLResponse);
 });
 
 const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => {
