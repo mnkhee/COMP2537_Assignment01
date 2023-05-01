@@ -21,6 +21,9 @@ app.use(
         store: dbStore,
         resave: false,
         saveUninitialized: false,
+        cookie: {
+            maxAge: 3600000
+        }
     })
 );
 
