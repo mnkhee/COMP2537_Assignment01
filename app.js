@@ -7,75 +7,101 @@ const bcrypt = require("bcrypt");
 const dotenv = require("dotenv");
 dotenv.config();
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 var MongoDBStore = require("connect-mongodb-session")(session);
 var dbStore = new MongoDBStore({
-    //uri: "mongodb://localhost:27017/connect_mongodb_session_test",
     uri: `mongodb+srv://${process.env.ATLAS_DB_USER}:${process.env.ATLAS_DB_PASSWORD}@cluster0.y8duirz.mongodb.net/comp2537w1?retryWrites=true&w=majority`,
-    collection: "mySessions"
+    collection: "mySessions",
 });
 
-app.use(session({
-    secret: "secret",
-    store: dbStore,
-    resave: false,
-    saveUninitialized: false,
-}))
+app.use(
+    session({
+        secret: "secret",
+        store: dbStore,
+        resave: false,
+        saveUninitialized: false,
+    })
+);
 
-app.get('/', (req, res) => {
+// Middleware that checks if the user has previously logged in
+const checkLoggedIn = (req, res, next) => {
+    if (req.session.GLOBAL_AUTHENTICATED) {
+        return res.redirect("/protectedRoute");
+    }
+    next();
+};
+
+app.get("/", checkLoggedIn, (req, res) => {
     res.send(`
     <h1>Welcome</h1>
     <p>Please sign up or log in to continue:</p>
     <button><a style="color: black; text-decoration: none" href="/signup">Sign Up</a></button>
     <button><a style="color: black; text-decoration: none" href="/login">Log in</a></button>
-    `)
-})
+    `);
+});
 
 app.use(express.json());
 
-app.get("/signup", (req, res) => {
+app.get("/signup", checkLoggedIn, (req, res) => {
     res.send(`
     <form action="/signup" method="post">
-    <input type="text", name="username", placeholder="Enter your username"/>
-    <br>
-    <input type="password", name="signPass", placeholder="Enter your password"/>
-    <input type="submit", value="sign up"/>
+    <input type="text" name="username" placeholder="Enter your username" />
+    <br />
+    <input type="email" name="email" placeholder="Enter your email" />
+    <br />
+    <input type="password" name="password" placeholder="Enter your password" />
+    <br />
+    <input type="submit" value="sign up" />
     </form>
-    `)
-})
+    `);
+});
 
 app.post("/signup", async (req, res) => {
+    const { username, email, password } = req.body;
+
+    if (!username) {
+        return res.status(400).send("username required");
+    }
+
+    if (!email) {
+        return res.status(400).send("email required");
+    }
+
+    if (!password) {
+        return res.status(400).send("password required");
+    }
+
     try {
-        const password = req.body.signPass;
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new usersModel({
-            username: req.body.username,
+            username: username,
+            email: email,
             password: hashedPassword,
-            type: "non-administrator"
-        })
+            type: "non-administrator",
+        });
         await user.save();
-        console.log(req.body.signPass);
+        console.log(password);
         res.send(`<p>User successfully created!</p>
         <br>
         <button><a style="color: black; text-decoration: none" href="/login">Log in</a></button>`);
     } catch (error) {
         console.log(error);
-        console.log(req.body.signPass);
+        console.log(password);
         res.send("Error creating user");
     }
-})
+});
 
-app.get("/login", (req, res) => {
+app.get("/login", checkLoggedIn, (req, res) => {
     res.send(`
     <form action="/login" method="post">
-    <input type="text", name="username", placeholder="Enter your username"/>
+    <input type="email" name="email" placeholder="Enter your email"/>
     <br>
-    <input type="password", name="password", placeholder="Enter your password"/>
-    <input type="submit", value="login"/>
+    <input type="password" name="password" placeholder="Enter your password"/>
+    <input type="submit" value="login"/>
     </form>
     `)
-})
+});
 
 // GLOBAL_AUTHENTICATED = false;
 app.use(express.urlencoded({ extended: false }));
