@@ -22,7 +22,7 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            expires: 3600000
+            maxAge: 3600000
         }
     })
 );
