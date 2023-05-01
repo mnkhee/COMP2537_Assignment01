@@ -14,6 +14,8 @@ var dbStore = new MongoDBStore({
 app.use(session({
     secret: "secret",
     store: dbStore,
+    resave: false,
+    saveUninitialized: false,
 }))
 
 app.get('/', (req, res) => {
