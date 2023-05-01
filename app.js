@@ -132,7 +132,7 @@ app.post("/login", async (req, res) => {
         });
         if (bcrypt.compareSync(req.body.password, result?.password)) {
             req.session.GLOBAL_AUTHENTICATED = true;
-            req.session.loggedUsername = req.body.username;
+            req.session.loggedUsername = result?.username;
             req.session.loggedEmail = req.body.email;
             req.session.loggedPassword = req.body.password;
             res.redirect("/protectedRoute");
@@ -158,8 +158,8 @@ app.use(authenticatedOnly);
 app.get("/protectedRoute", (req, res) => {
     res.send(
         `
-  <h1>Welcome!</h1>
-  <button><a style="color: black; text-decoration: none" href="/signout">Sign Out</a></button>
+  <h1>Welcome, ${req.session.loggedUsername}</h1>
+  <button><a style="color: black; text-decoration: none" href="/logout">Log out</a></button>
   <button><a style="color: black; text-decoration: none" href="/members">Members Page</a></button>
   `
   );
