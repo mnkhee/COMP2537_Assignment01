@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const session = require("express-session");
 const usersModel = require("./models/users.js");
+const bcrypt = require("bcrypt");
+
 var MongoDBStore = require("connect-mongodb-session")(session);
 
 app.listen(3000, () => {
