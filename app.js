@@ -38,7 +38,22 @@ app.get("/login", (req, res) => {
 // GLOBAL_AUTHENTICATED = false;
 app.use(express.urlencoded({ extended: false }));
 app.post("/login", async (req, res) => {
-    try {
+
+const Joi = require("joi");
+app.use(express.json());
+const schema = Joi.object({
+    password: Joi.string()
+});
+
+try {
+    const value = await schema.validateAsync({password: req.body.password});
+} catch (err) {
+    console.log(err);
+    console.log("Password must be a string")
+    return 
+}
+
+try {
     const result = await usersModel.findOne({
         username: req.body.username,
     })
