@@ -53,6 +53,10 @@ app.post("/login", async (req, res) => {
     } catch (error) {
         console.log(error)
     }
+});
+
+app.get("*", (req, res) => {
+    res.status(404).send("404 - Page not found");
 })
 
 // only for authenticated users
@@ -97,4 +101,10 @@ app.get("/protectedRouteForAdminsOnly", (req, res) => {
     res.send("Welcome Admin");
 });
 
+app.get("*", (req, res) => {
+    res.status(404).send("404 - Page not found");
+})
+
 module.exports = app;
+
+// for logging out. request.session.destroy(err)
