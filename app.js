@@ -36,16 +36,20 @@ app.get("/login", (req, res) => {
 // GLOBAL_AUTHENTICATED = false;
 app.use(express.urlencoded({ extended: false }));
 app.post("/login", async (req, res) => {
+    try {
     const result = await usersModel.findOne({
         username: req.body.username,
     })
-    if (bcrypt.compareSync(req.body.password, result.password)) {
+    if (bcrypt.compareSync(req.body.password, result?.password)) {
         req.session.GLOBAL_AUTHENTICATED = true;
         req.session.loggedUsername = req.body.username;
         req.session.loggedPassword = req.body.password;
         res.redirect("/protectedRoute");
     } else {
         res.send("incorrect password");
+    }
+    } catch (error) {
+        console.log(error)
     }
 })
 
@@ -71,6 +75,7 @@ app.get("/protectedRoute", (req, res) => {
 });
 
 const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => {
+    try {
     const result = await usersModel.findOne(
         {
             username: req.session.loggedUsername
@@ -80,6 +85,9 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
         return res.send("Access denied");
     }
     next();
+    } catch (error) {
+        console.log(error);
+    }
 };
 app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
