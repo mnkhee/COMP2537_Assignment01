@@ -124,17 +124,19 @@ app.post("/login", async (req, res) => {
         return
     }
 
-
     try {
         const result = await usersModel.findOne({
-            username: req.body.username,
-        })
+            email: req.body.email,
+        });
         if (bcrypt.compareSync(req.body.password, result?.password)) {
             req.session.GLOBAL_AUTHENTICATED = true;
             req.session.loggedUsername = req.body.username;
+            req.session.loggedEmail = req.body.email;
             req.session.loggedPassword = req.body.password;
             res.redirect("/protectedRoute");
         } else {
+            console.log(req.body.password);
+            console.log(result?.password);
             res.send("incorrect password");
         }
     } catch (error) {
@@ -181,9 +183,10 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
     try {
         const result = await usersModel.findOne(
             {
-                username: req.session.loggedUsername
+                email: req.session.loggedEmail,
             }
         )
+        console.log(req.session.loggedEmail);
         if (result?.type != "administrator") {
             return res.send("Access denied");
         }
