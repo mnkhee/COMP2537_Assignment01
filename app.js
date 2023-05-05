@@ -194,7 +194,12 @@ app.get("/members", (req, res) => {
     res.render("members.ejs", {
         "user": req.session.loggedUsername,
         "image": imageName,
-        "isAdmin": req.session.loggedType == "administrator"});
+        "isAdmin": req.session.loggedType == "administrator",
+        "todos": [
+            { name: "todo1", done: false },
+            { name: "todo1", done: false },
+            { name: "todo1", done: false }
+        ]});
 });
 
 const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => {
@@ -220,7 +225,7 @@ app.use(function (req, res, next) {
 
 app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
-app.get("/membersAdmin", (req, res) => {
+app.get("/admin", (req, res) => {
     res.send("Welcome Admin");
 });
 
