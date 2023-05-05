@@ -85,7 +85,7 @@ app.post("/signup", async (req, res) => {
             username: username,
             email: email,
             password: hashedPassword,
-            type: "non-administrator",
+            type: "user",
         });
         await user.save();
         console.log(password);
@@ -219,14 +219,58 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
     }
 };
 
-app.use(function (req, res, next) {
-    res.status(404).send("404 - Page not found")
-})
+// app.use(function (req, res, next) {
+//     res.status(404).send("404 - Page not found")
+// })
 
 app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
-app.get("/admin", (req, res) => {
-    res.send("Welcome Admin");
+app.get("/admin", authenticatedOnly, async (req, res) => {
+    const users = await usersModel.find();
+    res.render("admin", { "users": users });
+});
+
+app.post("/admin/editUserType", async (req, res) => {
+    const { userId, userType } = req.body;
+    console.log("dropDown", userId);
+    try {
+        const result = await usersModel.updateOne(
+            { _id: userId },
+            { $set: { type: userType } }
+        );
+        console.log(result);
+        res.redirect("/admin");
+    } catch (error) {
+        console.log(error);
+        res.send("Error updating user type");
+    }
+});
+
+app.post("/admin/promote", async (req, res) => {
+    const userId = req.body;
+    try {
+        const result = await usersModel.updateOne(
+            { _id: userId.userId },
+            { $set: { type: "administrator" } }
+        );
+        res.redirect("/admin");
+    } catch (error) {
+        res.send("An error happened, please try again");
+    }
+});
+
+app.post("/admin/demote", async (req, res) => {
+    const userId = req.body;
+    try {
+        const result = await usersModel.updateOne(
+            { _id: userId.userId },
+            { $set: { type: "user" } }
+        );
+        res.redirect("/admin");
+    } catch (error) {
+        res.send("An error happened, please try again");
+    }
 });
 
 module.exports = app;
+

@@ -4,10 +4,10 @@ const usersSchema = new mongoose.Schema({
     email: String,
     password: String,
     type: String,
-    todos: [
+    listOfUsers: [
         {
-            name: String,
-            done: {
+            username: String,
+            isAdmin: {
                 type: Boolean,
                 default: false
             }
