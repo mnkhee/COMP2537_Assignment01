@@ -191,7 +191,10 @@ app.get("/members", (req, res) => {
     // </form>
     // `
     // res.send(HTMLResponse);
-    res.render("members.ejs", {"user": req.session.loggedUsername, "image": imageName});
+    res.render("members.ejs", {
+        "user": req.session.loggedUsername,
+        "image": imageName,
+        "isAdmin": req.session.loggedType == "administrator"});
 });
 
 const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => {
