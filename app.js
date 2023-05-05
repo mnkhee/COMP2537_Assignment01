@@ -230,22 +230,6 @@ app.get("/admin", authenticatedOnly, async (req, res) => {
     res.render("admin", { "users": users });
 });
 
-app.post("/admin/editUserType", async (req, res) => {
-    const { userId, userType } = req.body;
-    console.log("dropDown", userId);
-    try {
-        const result = await usersModel.updateOne(
-            { _id: userId },
-            { $set: { type: userType } }
-        );
-        console.log(result);
-        res.redirect("/admin");
-    } catch (error) {
-        console.log(error);
-        res.send("Error updating user type");
-    }
-});
-
 app.post("/admin/promote", async (req, res) => {
     const userId = req.body;
     try {
