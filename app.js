@@ -5,6 +5,10 @@ const session = require("express-session");
 const usersModel = require("./models/users.js");
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv");
+const ejs = require("ejs");
+
+app.set("view engine", "ejs");
+
 dotenv.config();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -30,7 +34,7 @@ app.use(
 // Middleware that checks if the user has previously logged in
 const checkLoggedIn = (req, res, next) => {
     if (req.session.GLOBAL_AUTHENTICATED) {
-        return res.redirect("/members");
+        return res.redirect("/protectedRoute");
     }
     next();
 };
@@ -135,10 +139,11 @@ app.post("/login", async (req, res) => {
             req.session.loggedUsername = result?.username;
             req.session.loggedEmail = req.body.email;
             req.session.loggedPassword = req.body.password;
-            res.redirect("/protectedRoute");
+            req.session.loggedType = result?.type;
+            res.redirect("/members");
         } else {
-            console.log(req.body.password);
-            console.log(result?.password);
+            // console.log(req.body.password);
+            // console.log(result?.password);
             res.send("incorrect password");
         }
     } catch (error) {
@@ -155,41 +160,39 @@ const authenticatedOnly = (req, res, next) => {
 }
 app.use(authenticatedOnly);
 
-app.get("/protectedRoute", (req, res) => {
-    res.send(
-        `
-  <h1>Welcome, ${req.session.loggedUsername}</h1>
-  <button><a style="color: black; text-decoration: none" href="/logout">Log out</a></button>
-  <button><a style="color: black; text-decoration: none" href="/members">Members Page</a></button>
-  `
-  );
-})
-
-
-app.use(express.static("public"));
-app.get("/members", (req, res) => {
-    const randomImageNumber = Math.floor(Math.random() * 3) + 1;
-    const imageName = `00${randomImageNumber}.png`;
-    HTMLResponse = `
-    Welcome
-    <br>
-    <img src="${imageName}" />
-    <br>
-    <form action="/logout" method="post">
-        <input type="submit" value="Log out" />
-    </form>
-    `
-    res.send(HTMLResponse);
-});
-
 app.post("/logout", (req, res) => {
     req.session.destroy();
     res.redirect("/");
 });
 
-app.use(function (req, res, next) {
-    res.status(404).send("404 - Page not found")
+app.get("/protectedRoute", (req, res) => {
+//     res.send(
+//         `
+//   <h1>Welcome, ${req.session.loggedUsername}!</h1>
+//   <button><a style="color: black; text-decoration: none" href="/logout">Log out</a></button>
+//   <button><a style="color: black; text-decoration: none" href="/members">Members Page</a></button>
+//   `
+//   );
+    res.render("protectedRoute.ejs", {"user" : req.session.loggedUsername});
 })
+
+app.use(express.static("public"));
+app.get("/members", (req, res) => {
+    const randomImageNumber = Math.floor(Math.random() * 3) + 1;
+    const imageName = `00${randomImageNumber}.png`;
+
+    // HTMLResponse = `
+    // Welcome, ${req.session.loggedUsername}!
+    // <br>
+    // <img src="${imageName}" />
+    // <br>
+    // <form action="/logout" method="post">
+    //     <input type="submit" value="Log out" />
+    // </form>
+    // `
+    // res.send(HTMLResponse);
+    res.render("members.ejs", {"user": req.session.loggedUsername, "image": imageName});
+});
 
 const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => {
     try {
@@ -207,6 +210,11 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
         console.log(error);
     }
 };
+
+app.use(function (req, res, next) {
+    res.status(404).send("404 - Page not found")
+})
+
 app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
 app.get("/membersAdmin", (req, res) => {
