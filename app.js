@@ -40,12 +40,14 @@ const checkLoggedIn = (req, res, next) => {
 };
 
 app.get("/", checkLoggedIn, (req, res) => {
-    res.send(`
-    <h1>Welcome</h1>
-    <p>Please sign up or log in to continue:</p>
-    <button><a style="color: black; text-decoration: none" href="/signup">Sign Up</a></button>
-    <button><a style="color: black; text-decoration: none" href="/login">Log in</a></button>
-    `);
+    res.render("initial.ejs", {
+    });
+    // res.send(`
+    // <h1>Welcome</h1>
+    // <p>Please sign up or log in to continue:</p>
+    // <button><a style="color: black; text-decoration: none" href="/signup">Sign Up</a></button>
+    // <button><a style="color: black; text-decoration: none" href="/login">Log in</a></button>
+    // `);
 });
 
 app.use(express.json());
@@ -100,14 +102,7 @@ app.post("/signup", async (req, res) => {
 });
 
 app.get("/login", checkLoggedIn, (req, res) => {
-    res.send(`
-    <form action="/login" method="post">
-    <input type="email" name="email" placeholder="Enter your email"/>
-    <br>
-    <input type="password" name="password" placeholder="Enter your password"/>
-    <input type="submit" value="login"/>
-    </form>
-    `)
+    res.render("login.ejs", {});
 });
 
 app.use(express.urlencoded({ extended: false }));
@@ -161,48 +156,6 @@ const authenticatedOnly = (req, res, next) => {
 }
 app.use(authenticatedOnly);
 
-app.post("/logout", (req, res) => {
-    req.session.destroy();
-    res.redirect("/");
-});
-
-app.get("/home", (req, res) => {
-//     res.send(
-//         `
-//   <h1>Welcome, ${req.session.loggedUsername}!</h1>
-//   <button><a style="color: black; text-decoration: none" href="/logout">Log out</a></button>
-//   <button><a style="color: black; text-decoration: none" href="/members">Members Page</a></button>
-//   `
-//   );
-    res.render("home.ejs", {"user" : req.session.loggedUsername});
-})
-
-app.use(express.static("public"));
-app.get("/members", (req, res) => {
-    const randomImageNumber = Math.floor(Math.random() * 3) + 1;
-    const imageName = `00${randomImageNumber}.png`;
-
-    // HTMLResponse = `
-    // Welcome, ${req.session.loggedUsername}!
-    // <br>
-    // <img src="${imageName}" />
-    // <br>
-    // <form action="/logout" method="post">
-    //     <input type="submit" value="Log out" />
-    // </form>
-    // `
-    // res.send(HTMLResponse);
-    res.render("members.ejs", {
-        "user": req.session.loggedUsername,
-        "image": imageName,
-        "isAdmin": req.session.loggedType == "administrator",
-        "todos": [
-            { name: "todo1", done: false },
-            { name: "todo1", done: false },
-            { name: "todo1", done: false }
-        ]});
-});
-
 const requireLogin = (req, res, next) => {
     if (!req.session.GLOBAL_AUTHENTICATED) {
         return res.redirect("/login");
@@ -211,6 +164,28 @@ const requireLogin = (req, res, next) => {
 };
 
 app.use(requireLogin);
+
+app.post("/logout", (req, res) => {
+    req.session.destroy();
+    res.redirect("/");
+});
+
+app.get("/home", requireLogin, (req, res) => {
+    res.render("home.ejs", { "user": req.session.loggedUsername });
+})
+
+
+app.use(express.static("public"));
+app.get("/members", requireLogin, (req, res) => {
+    const randomImageNumber = Math.floor(Math.random() * 3) + 1;
+    const imageName = `00${randomImageNumber}.png`;
+
+    res.render("members.ejs", {
+        "user": req.session.loggedUsername,
+        "image": imageName,
+        "isAdmin": req.session.loggedType == "administrator",
+    });
+});
 
 const authenticatedAdmin = async (req, res, next) => {
     try {
