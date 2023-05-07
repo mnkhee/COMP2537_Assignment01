@@ -42,28 +42,12 @@ const checkLoggedIn = (req, res, next) => {
 app.get("/", checkLoggedIn, (req, res) => {
     res.render("initial.ejs", {
     });
-    // res.send(`
-    // <h1>Welcome</h1>
-    // <p>Please sign up or log in to continue:</p>
-    // <button><a style="color: black; text-decoration: none" href="/signup">Sign Up</a></button>
-    // <button><a style="color: black; text-decoration: none" href="/login">Log in</a></button>
-    // `);
 });
 
 app.use(express.json());
 
 app.get("/signup", checkLoggedIn, (req, res) => {
-    res.send(`
-    <form action="/signup" method="post">
-    <input type="text" name="username" placeholder="Enter your username" />
-    <br />
-    <input type="email" name="email" placeholder="Enter your email" />
-    <br />
-    <input type="password" name="password" placeholder="Enter your password" />
-    <br />
-    <input type="submit" value="sign up" />
-    </form>
-    `);
+    res.render("signup.ejs", {});
 });
 
 app.post("/signup", async (req, res) => {
@@ -163,16 +147,17 @@ const requireLogin = (req, res, next) => {
     next();
 };
 
+
 app.use(requireLogin);
+
+app.get("/home", requireLogin, (req, res) => {
+    res.render("home.ejs", { "user": req.session.loggedUsername });
+})
 
 app.post("/logout", (req, res) => {
     req.session.destroy();
     res.redirect("/");
 });
-
-app.get("/home", requireLogin, (req, res) => {
-    res.render("home.ejs", { "user": req.session.loggedUsername });
-})
 
 
 app.use(express.static("public"));

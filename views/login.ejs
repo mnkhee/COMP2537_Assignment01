@@ -23,14 +23,21 @@
 
     <%- include('partials/navbar'); %>
 
-    <div class="container m-3">
-    <form action="/login" method="post">
-        <input type="email" class="col-form-label m-1" name="email" placeholder="Enter your email" />
-        <br>
-        <input type="password" class="col-form-label m-1" name="password" placeholder="Enter your password" />
-        <input class="btn btn-success" type="submit" value="login" />
-    </form>
-    </div>
+        <div class="container m-3 text-center">
+            <h1>Log in</h1>
+            <form action="/login" method="post">
+                <input type="email" class="col-form-label m-1" name="email" placeholder="Enter your email" />
+                <br>
+                <input type="password" class="col-form-label m-1" name="password" placeholder="Enter your password" />
+                <br>
+                <input class="btn btn-success" type="submit" value="Login" />
+            </form>
+
+            <div class="bot text-center m-1">
+                <button class="btn btn-primary"><a style="color: white; text-decoration: none" href="/signup">
+                        Don't have an account? Sign up!</a></button>
+            </div>
+        </div>
 
 
         <%- include('partials/footer.ejs'); %>
