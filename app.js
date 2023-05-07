@@ -34,7 +34,7 @@ app.use(
 // Middleware that checks if the user has previously logged in
 const checkLoggedIn = (req, res, next) => {
     if (req.session.GLOBAL_AUTHENTICATED) {
-        return res.redirect("/protectedRoute");
+        return res.redirect("/home");
     }
     next();
 };
@@ -142,8 +142,6 @@ app.post("/login", async (req, res) => {
             req.session.loggedType = result?.type;
             res.redirect("/members");
         } else {
-            // console.log(req.body.password);
-            // console.log(result?.password);
             res.send("incorrect password");
         }
     } catch (error) {
@@ -154,7 +152,10 @@ app.post("/login", async (req, res) => {
 // only for authenticated users
 const authenticatedOnly = (req, res, next) => {
     if (!req.session.GLOBAL_AUTHENTICATED) {
-        return res.status(401).json({ error: "access denied" });
+        //return res.status(401).json({ error: "access denied" });
+        app.use(function (req, res, next) {
+            res.status(401).send("Access Denied");
+        })
     }
     next();
 }
@@ -165,7 +166,7 @@ app.post("/logout", (req, res) => {
     res.redirect("/");
 });
 
-app.get("/protectedRoute", (req, res) => {
+app.get("/home", (req, res) => {
 //     res.send(
 //         `
 //   <h1>Welcome, ${req.session.loggedUsername}!</h1>
@@ -173,7 +174,7 @@ app.get("/protectedRoute", (req, res) => {
 //   <button><a style="color: black; text-decoration: none" href="/members">Members Page</a></button>
 //   `
 //   );
-    res.render("protectedRoute.ejs", {"user" : req.session.loggedUsername});
+    res.render("home.ejs", {"user" : req.session.loggedUsername});
 })
 
 app.use(express.static("public"));
@@ -202,7 +203,16 @@ app.get("/members", (req, res) => {
         ]});
 });
 
-const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => {
+const requireLogin = (req, res, next) => {
+    if (!req.session.GLOBAL_AUTHENTICATED) {
+        return res.redirect("/login");
+    }
+    next();
+};
+
+app.use(requireLogin);
+
+const authenticatedAdmin = async (req, res, next) => {
     try {
         const result = await usersModel.findOne(
             {
@@ -223,9 +233,9 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
 //     res.status(404).send("404 - Page not found")
 // })
 
-app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
+app.use(authenticatedAdmin);
 
-app.get("/admin", authenticatedOnly, async (req, res) => {
+app.get("/admin", requireLogin, async (req, res) => {
     const users = await usersModel.find();
     res.render("admin", { "users": users });
 });
