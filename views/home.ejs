@@ -9,8 +9,30 @@
         integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
 </head>
 <style>
-    footer {
+    /* footer {
         margin-top: 470px;
+    } */
+    * {
+        margin: 0;
+    }
+
+    html,
+    body {
+        height: 100%;
+    }
+
+    .container {
+        min-height: 100%;
+        height: auto !important;
+        height: 100%;
+        margin: 0 auto -142px;
+        /* the bottom margin is the negative value of the footer's height */
+    }
+
+    .footer,
+    .push {
+        height: 142px;
+        /* .push must be the same height as .footer */
     }
 </style>
 
