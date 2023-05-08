@@ -4,15 +4,6 @@ const usersSchema = new mongoose.Schema({
     email: String,
     password: String,
     type: String,
-    listOfUsers: [
-        {
-            username: String,
-            isAdmin: {
-                type: Boolean,
-                default: false
-            }
-        }
-    ]
 });
 
 const usersModel = mongoose.model("users", usersSchema);

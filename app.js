@@ -189,10 +189,6 @@ const authenticatedAdmin = async (req, res, next) => {
     }
 };
 
-// app.use(function (req, res, next) {
-//     res.status(404).send("404 - Page not found")
-// })
-
 app.use(authenticatedAdmin);
 
 app.get("/admin", requireLogin, async (req, res) => {
@@ -225,6 +221,10 @@ app.post("/admin/demote", async (req, res) => {
         res.send("An error happened, please try again");
     }
 });
+
+app.use(function (req, res, next) {
+    res.status(404).send("404 - Page not found")
+})
 
 module.exports = app;
 
