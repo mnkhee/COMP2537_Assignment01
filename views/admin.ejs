@@ -25,23 +25,24 @@
 
         <% users.forEach(user=> {%>
             <div class="container p-3">
-            <tr>
-                <td>
-                    Username: <%= user.username %>
-                        <br>
-                        Type: <%= user.type %>
-                            <form action="/admin/promote" method="post">
-                                <input type="hidden" name="userId" value="<%= user._id %>">
-                                <button class="btn btn-primary" value="administrator" <%=user.type="administrator" ? "selected" : "" %>>Promote
-                                    to
-                                    Admin</button>
-                            </form>
-                            <form action="/admin/demote" method="post">
-                                <input type="hidden" name="userId" value="<%= user._id %>">
-                                <button class="btn btn-danger" value="user" <%=user.type="user" ? "selected" : "" %>>Demote to User</button>
-                            </form>
-                </td>
-            </tr>
+                <tr>
+                    <td>
+                        Username: <%= user.username %>
+                            <br>
+                            Type: <%= user.type %>
+                                <form action="/admin/promote" method="post">
+                                    <input type="hidden" name="userId" value="<%= user._id %>">
+                                    <button class="btn btn-primary" value="administrator" <%=user.type="administrator"
+                                        ? "selected" : "" %>>Promote
+                                        to Admin</button>
+                                </form>
+                                <form action="/admin/demote" method="post">
+                                    <input type="hidden" name="userId" value="<%= user._id %>">
+                                    <button class="btn btn-danger" value="user" <%=user.type="user" ? "selected" : ""
+                                        %>>Demote to User</button>
+                                </form>
+                    </td>
+                </tr>
             </div>
             <%})%>
 

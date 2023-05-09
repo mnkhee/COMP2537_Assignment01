@@ -133,7 +133,7 @@ const authenticatedOnly = (req, res, next) => {
     if (!req.session.GLOBAL_AUTHENTICATED) {
         //return res.status(401).json({ error: "access denied" });
         app.use(function (req, res, next) {
-            res.status(401).send("Access Denied");
+            res.status(403).send("Access Denied");
         })
     }
     next();
